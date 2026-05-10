@@ -1,5 +1,6 @@
 import { getAllPosts } from '@/lib/posts'
 import PostCard from '@/components/PostCard'
+import AdUnit from '@/components/AdUnit'
 import { PenLine, Users, Lightbulb } from 'lucide-react'
 
 export default function Home() {
@@ -62,10 +63,7 @@ export default function Home() {
 
       {/* Articles Section */}
       <div className="max-w-5xl mx-auto px-4 py-12">
-        {/* Ad space */}
-        <div className="bg-gray-100 rounded-2xl h-20 flex items-center justify-center text-gray-400 text-sm mb-10 border border-gray-200">
-          広告スペース
-        </div>
+        <AdUnit slot="1234567890" className="mb-10" />
 
         <div className="flex items-center gap-3 mb-6">
           <h2 className="text-xl font-bold text-gray-900">最新記事</h2>

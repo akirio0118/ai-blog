@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { Calendar, ArrowLeft, Tag } from 'lucide-react'
+import AdUnit from '@/components/AdUnit'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -53,10 +54,7 @@ export default async function PostPage({ params }: Props) {
         </div>
       </div>
 
-      {/* Ad space */}
-      <div className="bg-gray-100 rounded-2xl h-20 flex items-center justify-center text-gray-400 text-sm mb-8 border border-gray-200/80">
-        広告スペース
-      </div>
+      <AdUnit slot="0987654321" className="mb-8" />
 
       {/* Article Body */}
       <article
@@ -64,10 +62,7 @@ export default async function PostPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: post.content }}
       />
 
-      {/* Ad space bottom */}
-      <div className="bg-gray-100 rounded-2xl h-20 flex items-center justify-center text-gray-400 text-sm mt-12 border border-gray-200/80">
-        広告スペース
-      </div>
+      <AdUnit slot="1122334455" className="mt-12" />
 
       {/* Back link */}
       <div className="mt-10 pt-8 border-t border-gray-200">
