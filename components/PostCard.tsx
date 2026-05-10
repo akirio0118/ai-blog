@@ -1,54 +1,70 @@
 import Link from 'next/link'
-import { ArrowRight, Calendar, Bot, Search, Zap, BookOpen, Cpu } from 'lucide-react'
+import { ArrowRight, Calendar } from 'lucide-react'
 import type { PostMeta } from '@/lib/posts'
 
-const tagIconMap: Record<string, React.ReactNode> = {
-  'ChatGPT': <Bot className="w-4 h-4" />,
-  'Claude': <Cpu className="w-4 h-4" />,
-  'Gemini': <Zap className="w-4 h-4" />,
-  'Perplexity': <Search className="w-4 h-4" />,
-  'AI検索': <Search className="w-4 h-4" />,
-  'プロンプト': <BookOpen className="w-4 h-4" />,
-}
-
-const cardAccents = [
-  'from-blue-500 to-indigo-500',
-  'from-violet-500 to-purple-500',
-  'from-cyan-500 to-blue-500',
-  'from-emerald-500 to-teal-500',
-  'from-orange-500 to-amber-500',
-  'from-rose-500 to-pink-500',
+// カバー画像風グラデーション & 絵文字の設定（slugベース）
+const covers = [
+  { gradient: 'from-blue-400 to-indigo-500', emoji: '🤖', bg: 'bg-blue-50' },
+  { gradient: 'from-violet-400 to-purple-500', emoji: '🧠', bg: 'bg-violet-50' },
+  { gradient: 'from-cyan-400 to-sky-500', emoji: '🔍', bg: 'bg-cyan-50' },
+  { gradient: 'from-emerald-400 to-teal-500', emoji: '✍️', bg: 'bg-emerald-50' },
+  { gradient: 'from-orange-400 to-amber-500', emoji: '💡', bg: 'bg-orange-50' },
+  { gradient: 'from-rose-400 to-pink-500', emoji: '⚡', bg: 'bg-rose-50' },
 ]
 
-function getAccent(slug: string) {
-  const index = slug.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % cardAccents.length
-  return cardAccents[index]
+// タグに応じた絵文字マッピング
+const tagEmoji: Record<string, string> = {
+  'ChatGPT': '🤖',
+  'Claude': '🧠',
+  'Gemini': '✨',
+  'Perplexity': '🔍',
+  'AI検索': '🔍',
+  'プロンプト': '✍️',
+  'Google AI': '✨',
+  'AI': '💡',
 }
 
-function getTopicIcon(tags: string[]) {
+function getCover(slug: string) {
+  const index = slug.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % covers.length
+  return covers[index]
+}
+
+function getEmoji(tags: string[]) {
   for (const tag of tags) {
-    if (tagIconMap[tag]) return tagIconMap[tag]
+    if (tagEmoji[tag]) return tagEmoji[tag]
   }
-  return <Bot className="w-4 h-4" />
+  return '💬'
 }
 
 export default function PostCard({ post }: { post: PostMeta }) {
-  const accent = getAccent(post.slug)
+  const cover = getCover(post.slug)
+  const emoji = getEmoji(post.tags)
+
   return (
-    <article className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group hover:-translate-y-1">
-      <div className={`h-1.5 bg-gradient-to-r ${accent}`} />
-      <div className="p-6">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex flex-wrap gap-2">
-            {post.tags.slice(0, 3).map((tag) => (
-              <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full font-medium">
-                {tag}
-              </span>
-            ))}
+    <article className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden group hover:-translate-y-0.5">
+      {/* Cover image area */}
+      <Link href={`/posts/${post.slug}`}>
+        <div className={`relative h-36 bg-gradient-to-br ${cover.gradient} flex items-center justify-center overflow-hidden`}>
+          {/* Background pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-2 left-4 text-6xl select-none">{emoji}</div>
+            <div className="absolute bottom-2 right-6 text-4xl select-none rotate-12">{emoji}</div>
           </div>
-          <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${accent} flex items-center justify-center text-white flex-shrink-0 ml-2`}>
-            {getTopicIcon(post.tags)}
+          {/* Center icon */}
+          <div className="relative text-6xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300">
+            {emoji}
           </div>
+        </div>
+      </Link>
+
+      {/* Card body */}
+      <div className="p-5">
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          {post.tags.slice(0, 3).map((tag) => (
+            <span key={tag} className={`text-xs ${cover.bg} text-gray-600 px-2.5 py-0.5 rounded-full font-medium`}>
+              {tag}
+            </span>
+          ))}
         </div>
 
         <Link href={`/posts/${post.slug}`}>
