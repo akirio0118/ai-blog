@@ -93,31 +93,36 @@ if (useLootDrop) {
   // 13:00 JST枠: 失敗AIスタートアップから教訓記事
   const startup = getLootDropTopic();
   if (startup) {
-    console.log(`loot-drop記事: ${startup.name}`);
+    console.log(`loot-drop記事: ${startup.name} / 失敗原因: ${startup.cause}`);
     const existingList = existingTitles.join('\n- ');
-    prompt = `AIスタートアップの失敗事例を基にした教育的なブログ記事を日本語で書いてください。
 
-## 取り上げる失敗スタートアップ
-- 企業名: ${startup.name}
-- 分野: ${startup.category}
-- 調達資金: ${startup.funding}
-- 創業年: ${startup.founded}年
-- 廃業年: ${startup.closed}年
-- 主な失敗原因: ${startup.cause}
+    // 失敗原因ごとに読者向けの実用テーマを導く
+    const causeToAngle = {
+      'Competition':        `大手AI企業（OpenAI・Google・Anthropic）がサービスを無料・格安で提供し、${startup.category}分野のスタートアップを淘汰してきた。読者が「長く使い続けられる信頼性の高いAIツール」を選ぶための判断基準を提供する。`,
+      'Ran Out of Cash':    `${startup.category}分野で$${startup.funding}を調達しても${startup.closed}年に資金が尽きた。無料・低コストで使えるAIツールが突然終了するリスクと、コストを抑えながらAIを活用し続けるための実践的な方法を提供する。`,
+      'Unit Economics':     `${startup.category}の${startup.name}は収益よりもAI推論コストが膨らみサービス終了した。読者が無駄なコストをかけずにAIツールを最大活用するためのコスト最適化の視点を提供する。`,
+      'Team/Founder Conflict': `優れた技術を持つAIスタートアップでも組織の問題でサービスが突然終わることがある。ツール依存のリスク分散とデータのポータビリティを意識したAI活用術を提供する。`,
+      'Legal/Regulatory':   `${startup.category}分野では法規制がサービス存続を左右する。個人情報・著作権・業務データをAIツールに渡す際の安全な使い方とリスク管理を提供する。`,
+    };
+    const angle = causeToAngle[startup.cause] || `${startup.cause}が原因で${startup.name}は廃業した。この失敗パターンをふまえて、読者がAIツールをより賢く・安全に活用するための実践的な方法を提供する。`;
 
-## 参考: AI業界全体の失敗統計（loot-drop.ioより）
-- 分析対象: 34社の失敗AIスタートアップ、総燃焼額$66億
-- 最大の死因: 競合他社（64.7%）— 大手テック企業が高性能モデルを無料提供
-- 次点: 資金枯渇（17.6%）、ユニットエコノミクス（5.9%）
+    prompt = `AIスタートアップの失敗データをもとに、読者が実際に役立てられるブログ記事を日本語で書いてください。
+
+## 背景データ（記事の根拠として使う）
+- ${startup.name}（${startup.category}）: 調達${startup.funding}、${startup.founded}〜${startup.closed}年、廃業原因「${startup.cause}」
+- AI業界全体: 34社が廃業、総損失$66億、失敗原因1位は競合他社（64.7%）
+
+## 記事のテーマ・角度
+${angle}
 
 ## 既存記事（重複禁止）
 - ${existingList}
 
 ## 記事要件
 - ターゲット: AIツールを使い始めた日本人の初心者〜中級者
-- ${startup.name}が「なぜ失敗したのか」を分かりやすく解説
-- AI業界の構造的な問題（大手の独占など）を初心者向けに解説
-- 読者への実践的な教訓（どのAIツールを選ぶべきか、何に注意すべきかなど）
+- スタートアップの失敗話ではなく、「読者が今日から実践できる」内容を中心に書く
+- 失敗データは「なぜこの話が重要か」の根拠として冒頭で軽く触れる程度にとどめる
+- 具体的なツール名・手順・コツを含める
 - 目標文字数: 1500〜2500文字
 
 出力形式（マークダウン、フロントマターを含む完全な形式のみ出力）:
@@ -125,7 +130,7 @@ if (useLootDrop) {
 title: "（魅力的なタイトル）"
 date: "${today}"
 description: "（検索向けの説明文、120文字以内）"
-tags: ["AI", "スタートアップ", "失敗事例"]
+tags: ["タグ1", "タグ2", "タグ3"]
 ---
 
 ## （見出し）
