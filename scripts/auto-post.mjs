@@ -50,7 +50,19 @@ function getExistingTitles() {
     });
 }
 
-// フォールバック: 事前定義トピックから次の1件を選ぶ
+// フォールバック1: loot-drop.io失敗スタートアップから次の1件を選ぶ
+function getLootDropTopic() {
+  const lootPath = path.join(__dirname, 'lootdrop.json');
+  const data = JSON.parse(fs.readFileSync(lootPath, 'utf-8'));
+  const startup = data.startups.find(s => !s.used);
+  if (!startup) return null;
+  startup.used = true;
+  startup.publishedAt = today;
+  fs.writeFileSync(lootPath, JSON.stringify(data, null, 2), 'utf-8');
+  return startup;
+}
+
+// フォールバック2: 事前定義トピックから次の1件を選ぶ
 function getFallbackTopic() {
   const topicsPath = path.join(__dirname, 'topics.json');
   const data = JSON.parse(fs.readFileSync(topicsPath, 'utf-8'));
@@ -67,17 +79,72 @@ const newsItems = await fetchLatestAINews();
 const existingTitles = getExistingTitles();
 const hasNews = newsItems.length > 0;
 
-console.log(`ニュース取得: ${newsItems.length}件`);
+// 実行時刻(UTC)でコンテンツソースをローテーション
+// 0:00 UTC(9:00 JST) → ニュース, 4:00 UTC(13:00 JST) → loot-drop, 8:00 UTC(17:00 JST) → ニュース
+const utcHour = new Date().getUTCHours();
+const useLootDrop = utcHour === 4;
+
+console.log(`ニュース取得: ${newsItems.length}件, utcHour: ${utcHour}, useLootDrop: ${useLootDrop}`);
 
 let prompt;
 let articleId;
 
-if (hasNews) {
-  // ニュースベースで記事生成
-  const newsList = newsItems.map((n, i) => `${i + 1}. ${n.title}\n   ${n.desc}`).join('\n');
-  const existingList = existingTitles.join('\n- ');
+if (useLootDrop) {
+  // 13:00 JST枠: 失敗AIスタートアップから教訓記事
+  const startup = getLootDropTopic();
+  if (startup) {
+    console.log(`loot-drop記事: ${startup.name}`);
+    const existingList = existingTitles.join('\n- ');
+    prompt = `AIスタートアップの失敗事例を基にした教育的なブログ記事を日本語で書いてください。
 
-  prompt = `以下は本日（${today}）のAI関連最新ニュースです。
+## 取り上げる失敗スタートアップ
+- 企業名: ${startup.name}
+- 分野: ${startup.category}
+- 調達資金: ${startup.funding}
+- 創業年: ${startup.founded}年
+- 廃業年: ${startup.closed}年
+- 主な失敗原因: ${startup.cause}
+
+## 参考: AI業界全体の失敗統計（loot-drop.ioより）
+- 分析対象: 34社の失敗AIスタートアップ、総燃焼額$66億
+- 最大の死因: 競合他社（64.7%）— 大手テック企業が高性能モデルを無料提供
+- 次点: 資金枯渇（17.6%）、ユニットエコノミクス（5.9%）
+
+## 既存記事（重複禁止）
+- ${existingList}
+
+## 記事要件
+- ターゲット: AIツールを使い始めた日本人の初心者〜中級者
+- ${startup.name}が「なぜ失敗したのか」を分かりやすく解説
+- AI業界の構造的な問題（大手の独占など）を初心者向けに解説
+- 読者への実践的な教訓（どのAIツールを選ぶべきか、何に注意すべきかなど）
+- 目標文字数: 1500〜2500文字
+
+出力形式（マークダウン、フロントマターを含む完全な形式のみ出力）:
+---
+title: "（魅力的なタイトル）"
+date: "${today}"
+description: "（検索向けの説明文、120文字以内）"
+tags: ["AI", "スタートアップ", "失敗事例"]
+---
+
+## （見出し）
+
+（本文）`;
+
+    articleId = `ai-failure-${startup.id}-${today}`;
+  } else {
+    console.log('loot-dropトピック枯渇、ニュースにフォールバック');
+  }
+}
+
+if (!prompt) {
+  if (hasNews) {
+    // ニュースベースで記事生成
+    const newsList = newsItems.map((n, i) => `${i + 1}. ${n.title}\n   ${n.desc}`).join('\n');
+    const existingList = existingTitles.join('\n- ');
+
+    prompt = `以下は本日（${today}）のAI関連最新ニュースです。
 
 ## 最新ニュース
 ${newsList}
@@ -107,19 +174,18 @@ tags: ["タグ1", "タグ2", "タグ3"]
 
 （本文）`;
 
-  // slugはタイムスタンプベースで一意に
-  const timestamp = Date.now();
-  articleId = `ai-news-${today}-${timestamp}`;
-} else {
-  // フォールバック: 事前定義トピック
-  const topic = getFallbackTopic();
-  if (!topic) {
-    console.log('利用可能なトピックがありません');
-    process.exit(0);
-  }
-  console.log(`フォールバックトピック使用: ${topic.title}`);
+    const timestamp = Date.now();
+    articleId = `ai-news-${today}-${timestamp}`;
+  } else {
+    // フォールバック: 事前定義トピック
+    const topic = getFallbackTopic();
+    if (!topic) {
+      console.log('利用可能なトピックがありません');
+      process.exit(0);
+    }
+    console.log(`フォールバックトピック使用: ${topic.title}`);
 
-  prompt = `AI活用ブログの記事を日本語で書いてください。
+    prompt = `AI活用ブログの記事を日本語で書いてください。
 
 トピック: ${topic.title}
 ターゲット読者: AIツールを使い始めた初心者〜中級者の日本人
@@ -137,7 +203,8 @@ tags: [${topic.tags.map(t => `"${t}"`).join(', ')}]
 
 （本文）`;
 
-  articleId = topic.id;
+    articleId = topic.id;
+  }
 }
 
 console.log('記事生成中...');

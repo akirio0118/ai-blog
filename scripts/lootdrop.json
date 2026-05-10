@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "source": "https://www.loot-drop.io/deep-dive/ai",
+    "total": 34,
+    "totalBurned": "$6.6B",
+    "avgLifespan": "4.8years",
+    "topKiller": "Competition (64.7%)"
+  },
+  "startups": [
+    { "id": "argo-ai", "name": "Argo AI", "funding": "$3.6B", "founded": 2016, "closed": 2022, "cause": "Ran Out of Cash", "category": "自動運転AI", "used": false },
+    { "id": "tusimple", "name": "TuSimple", "funding": "$1.0B", "founded": 2015, "closed": 2024, "cause": "Team/Founder Conflict", "category": "自動運転AI", "used": false },
+    { "id": "olive-ai", "name": "Olive AI", "funding": "$852M", "founded": 2012, "closed": 2023, "cause": "Unit Economics", "category": "医療AI", "used": false },
+    { "id": "lidian", "name": "Lidian", "funding": "$300M", "founded": 2017, "closed": 2024, "cause": "Ran Out of Cash", "category": "AI", "used": false },
+    { "id": "ghost-autonomy", "name": "Ghost Autonomy", "funding": "$220M", "founded": 2017, "closed": 2024, "cause": "Ran Out of Cash", "category": "自動運転AI", "used": false },
+    { "id": "lingyun", "name": "Lingyun", "funding": "$150M", "founded": 2014, "closed": 2024, "cause": "Ran Out of Cash", "category": "AI", "used": false },
+    { "id": "jiyan-ai", "name": "Jiyan AI", "funding": "$120M", "founded": 2021, "closed": 2024, "cause": "Legal/Regulatory", "category": "生成AI", "used": false },
+    { "id": "vision-ai", "name": "VisionAI", "funding": "$80M", "founded": 2020, "closed": 2025, "cause": "Competition", "category": "コンピュータービジョンAI", "used": false },
+    { "id": "isentium", "name": "Isentium", "funding": "$50M", "founded": 2012, "closed": 2020, "cause": "Competition", "category": "金融AI", "used": false },
+    { "id": "nebula", "name": "Nebula", "funding": "$25M", "founded": 2018, "closed": 2024, "cause": "Competition", "category": "AI", "used": false },
+    { "id": "fobo", "name": "Fobo", "funding": "$25M", "founded": 2013, "closed": 2017, "cause": "Competition", "category": "AI", "used": false },
+    { "id": "passenger-ai", "name": "Passenger AI", "funding": "$15M", "founded": 2018, "closed": 2021, "cause": "Competition", "category": "AI", "used": false }
+  ]
+}

@@ -37,5 +37,5 @@ jobs:
         run: |
           git config user.name "AI Auto Poster"
           git config user.email "autopost@ai-katsuyo-guide.com"
-          git add posts/ scripts/topics.json
+          git add posts/ scripts/topics.json scripts/lootdrop.json
           git diff --staged --quiet || (git commit -m "🤖 記事自動投稿: $(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M')" && git push)
